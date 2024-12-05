@@ -1,0 +1,82 @@
+name: curryware-api-controller Build
+on: [push]
+jobs:
+  deploy curryware-api-controller:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get-Source
+        uses: actions/checkout@v4
+
+      - name: Install Node for NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm install -g @datadog/datadog-ci
+      - run: DATADOG_SITE=datadoghq.com DD_API_KEY=${{ secrets.DD_API_KEY }} datadog-ci tag --level pipeline --tags slack-channel:curryware-api-controller
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
+      - name: Check imported libraries are secure and compliant
+        id: datadog-software-composition-analysis
+        uses: Datadog/datadog-sca-github-action@main
+        with:
+          dd_api_key: ${{ DD_API_KEY }}
+          dd_app_key: ${{ DD_APP_KEY }}
+          dd_service: curryware-api-controller
+          dd_site: datadoghq.com
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_AUTH_TOKEN }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: scotcurry4/curryware-api-controller:${{ github.run_number }}
+          labels:
+            org.opencontainers.image.source=github.com/scotcurry/curryware-api-controller
+            org.opencontainers.image.revision=${{ github.sha }}
+            tags.datadoghq.com/env=prod
+            tags.datadoghq.com/version=${{ github.run_number }}
+            tags.datadoghq.com/service=curryware-api-controller
+
+      - name: Get manifest files
+        uses: actions/checkout@v4
+        with:
+          repository: 'scotcurry/k8s-manifests'
+          path: '${{ github.workspace }}/k8s-manifests'
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+          ref: 'main'
+      - run: |
+        echo ${{ github.workspace }}
+        cd ${{ github.workspace }}/k8s-manifests
+        ls -la
+        # sed pattern to update manifest versions - 's/version: \"[[:digit:]]*\"/version: \"20\"/g'
+        # Site to test sed commands - https://sed.js.org/
+        echo 'Setting Version: ${{ github.run_number }}'
+        sed -i -e 's/version:
+          \"[[:digit:]]*\"/version: \"${{ github.run_number }}\"/g' ${{ github.workspace }}/k8s-manifests/curryware-fantasy/curryware-api-controller-deployment.yaml
+        echo 'Updating image version'
+        sed -i -e 's/scotcurry4\/curryware-front-end:[[:digit:]]*/scotcurry4\/curryware-api-controller:${{ github.run_number }}/g' ${{ github.workspace }}/k8s-manifests/curryware-fantasy/curryware-api-controller-deployment.yaml
+        cat ${{ github.workspace }}/k8s-manifests/curryware-fantasy/curryware-api-controller-deployment.yaml
+        echo "Committed curryware-front-end $(date +"%Y-%m-%d %T") - Short SHA: ${{ github.sha }}" > commit_file.txt
+        git config user.name "scotcurry"
+        git config user.email "scotcurry4@gmail.com"
+        git commit -F commit_file.txt .
+        git push
