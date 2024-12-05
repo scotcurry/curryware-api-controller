@@ -1,0 +1,27 @@
+schema-version: v2.2
+dd-service: curryware-api-controller
+team: curryware-team
+application: curryware-ff
+tier: "1"
+type: web
+lifecycle: "production"
+languages:
+  - python
+contacts:
+  - type: slack
+    contact: https://currywareinc.slack.com/archives/C083PNWAGJ2
+  - type: email
+    contact: scotcurry4@gmail.com
+links:
+  - name: Runbook
+    type: runbook
+    url: https://curryware.atlassian.net/wiki/spaces/currywarea/overview?homepageId=116719852
+  - name: Source
+    type: repo
+    provider: github
+    url: https://github.com/scotcurry/curryware-api-controller
+  - name: Documentation
+    type: doc
+    url: https://curryware.atlassian.net/wiki/spaces/currywarea/pages/115998725/Build+Information
+ci-pipeline-fingerprints:
+  - fXwRPHnMvAfy
