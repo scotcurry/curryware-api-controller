@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
-      - run: pip install --no-cache-dir --upgrade -r requirements.txt
+      - run: pip install --upgrade -r requirements.txt
 
       - name: Check imported libraries are secure and compliant
         id: datadog-software-composition-analysis
@@ -74,7 +74,7 @@ jobs:
           echo 'Updating image version'
           sed -i -e 's/scotcurry4\/curryware-front-end:[[:digit:]]*/scotcurry4\/curryware-api-controller:${{ github.run_number }}/g' ${{ github.workspace }}/k8s-manifests/curryware-fantasy/curryware-api-controller-deployment.yaml
           cat ${{ github.workspace }}/k8s-manifests/curryware-fantasy/curryware-api-controller-deployment.yaml
-          echo "Committed curryware-front-end $(date +"%Y-%m-%d %T") - Short SHA: ${{ github.sha }}" > commit_file.txt
+          echo "Committed curryware-api-controller $(date +"%Y-%m-%d %T") - Short SHA: ${{ github.sha }}" > commit_file.txt
           git config user.name "scotcurry"
           git config user.email "scotcurry4@gmail.com"
           git commit -F commit_file.txt .
