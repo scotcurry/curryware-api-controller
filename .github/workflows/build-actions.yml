@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
-      - run: pip install --no-cache-dir --upgrade -r /code/requirements.txt
+      - run: pip install --no-cache-dir --upgrade -r /requirements.txt
 
       - name: Check imported libraries are secure and compliant
         id: datadog-software-composition-analysis
