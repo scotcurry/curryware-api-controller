@@ -1,7 +1,7 @@
 name: curryware-api-controller Build
 on: [push]
 jobs:
-  deploy curryware-api-controller:
+  deploy-curryware-api-controller:
     runs-on: ubuntu-latest
     steps:
       - name: Get-Source
