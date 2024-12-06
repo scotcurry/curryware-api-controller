@@ -3,7 +3,7 @@ import requests
 from fastapi import FastAPI
 
 app = FastAPI()
-curryware_yahoo_api_controller_url = 'http://http://curryware-yahoo-api:8087/YahooApi'
+curryware_yahoo_api_controller_url = 'http://curryware-yahoo-api:8087/YahooApi'
 
 FORMAT = ('%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] - '
               '%(message)s')
