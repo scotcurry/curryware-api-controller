@@ -17,7 +17,7 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get('//v1/load_players')
+@app.get('/v1/load_players')
 async def load_players(league_id: str, team_id: str):
     load_player_endpoint = '/GetAllPlayers'
     request_url = curryware_yahoo_api_controller_url + load_player_endpoint
